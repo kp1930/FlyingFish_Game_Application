@@ -4,5 +4,6 @@
     <string name="img_splash">TODO</string>
     <string name="game_over">Game Over</string>
     <string name="play_again">Play Again</string>
+    <string name="score">Score</string>
 
 </resources>
