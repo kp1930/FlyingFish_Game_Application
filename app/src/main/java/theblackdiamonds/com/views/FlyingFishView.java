@@ -2,6 +2,7 @@ package theblackdiamonds.com.views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,15 +11,17 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import theblackdiamonds.com.R;
+import theblackdiamonds.com.activities.GameOverActivity;
 
 /**
  * Created by Kush Pandya on 8/19/2019.
  */
 public class FlyingFishView extends View {
 
-    int score, canvasWidth, canvasHeight;
+    int score, canvasWidth, canvasHeight, lifeCounterOfFish;
     int yellowX, yellowY, yellowSpeed = 16;
     int greenX, greenY, greenSpeed = 20;
     int redX, redY, redSpeed = 25;
@@ -58,6 +61,8 @@ public class FlyingFishView extends View {
         life[1] = BitmapFactory.decodeResource(getResources(), R.drawable.heart_grey);
 
         fishY = 550;
+        score = 0;
+        lifeCounterOfFish = 3;
     }
 
     @Override
@@ -95,7 +100,6 @@ public class FlyingFishView extends View {
             score = score + 10;
             yellowX = -100;
         }
-
         if (yellowX < 0) {
             yellowX = canvasWidth + 21;
             yellowY = (int) Math.floor(Math.random() * (maxFishY - minFishY)) + minFishY;
@@ -108,7 +112,6 @@ public class FlyingFishView extends View {
             score = score + 20;
             greenX = -100;
         }
-
         if (greenX < 0) {
             greenX = canvasWidth + 21;
             greenY = (int) Math.floor(Math.random() * (maxFishY - minFishY)) + minFishY;
@@ -119,8 +122,15 @@ public class FlyingFishView extends View {
 
         if (isHit(redX, redY)) {
             redX = -100;
-        }
+            lifeCounterOfFish--;
 
+            if (lifeCounterOfFish == 0) {
+                Toast.makeText(getContext(), "Game Over", Toast.LENGTH_SHORT).show();
+                Intent gameOverIntent = new Intent(getContext(), GameOverActivity.class);
+                gameOverIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                getContext().startActivity(gameOverIntent);
+            }
+        }
         if (redX < 0) {
             redX = canvasWidth + 21;
             redY = (int) Math.floor(Math.random() * (maxFishY - minFishY)) + minFishY;
@@ -129,9 +139,16 @@ public class FlyingFishView extends View {
 
         canvas.drawText("Score : " + score, 20, 60, scorerPaint);
 
-        canvas.drawBitmap(life[0], 580, 10, null);
-        canvas.drawBitmap(life[0], 680, 10, null);
-        canvas.drawBitmap(life[0], 780, 10, null);
+        for (int i = 0; i < 3; i++) {
+            int x = (int) (580 + life[0].getWidth() * 1.5 * i);
+            int y = 30;
+
+            if (i < lifeCounterOfFish) {
+                canvas.drawBitmap(life[0], x, y, null);
+            } else {
+                canvas.drawBitmap(life[1], x, y, null);
+            }
+        }
     }
 
     public boolean isHit(int x, int y) {
